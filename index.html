@@ -814,34 +814,67 @@
             mobileMenuToggle.classList.toggle('active');
         });
 
-        // Navigation fluide entre les pages
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('.page-section');
+       // Navigation fluide entre les pages
+const navLinks = document.querySelectorAll('.nav-link');
+const sections = document.querySelectorAll('.page-section');
 
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                
-                // Récupérer la section cible
-                const targetId = link.getAttribute('href').substring(1);
-                
-                // Retirer la classe active de toutes les sections et liens
-                sections.forEach(section => section.classList.remove('active'));
-                navLinks.forEach(navLink => navLink.classList.remove('active'));
-                
-                // Ajouter la classe active à la section et au lien cibles
-                document.getElementById(targetId).classList.add('active');
-                link.classList.add('active');
-                
-                // Fermer le menu mobile si ouvert
-                navMenu.classList.remove('active');
-                mobileMenuToggle.classList.remove('active');
-                
-                // Défiler vers le haut en douceur
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        });
+// Fonction pour afficher une section
+function showSection(targetId) {
+    // Retirer la classe active de toutes les sections et liens
+    sections.forEach(section => section.classList.remove('active'));
+    navLinks.forEach(navLink => navLink.classList.remove('active'));
+    
+    // Ajouter la classe active à la section cible
+    const targetSection = document.getElementById(targetId);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
+    
+    // Activer le lien correspondant
+    navLinks.forEach(navLink => {
+        if (navLink.getAttribute('href') === '#' + targetId) {
+            navLink.classList.add('active');
+        }
+    });
+    
+    // Défiler vers le haut
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
+// Gérer les clics sur les liens
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href').substring(1);
+        showSection(targetId);
+        
+        // Fermer le menu mobile si ouvert
+        navMenu.classList.remove('active');
+        mobileMenuToggle.classList.remove('active');
+        
+        // Mettre à jour l'URL sans recharger la page
+        window.location.hash = targetId;
+    });
+});
+
+// Gérer le hash dans l'URL au chargement de la page
+window.addEventListener('load', () => {
+    const hash = window.location.hash.substring(1);
+    if (hash && document.getElementById(hash)) {
+        showSection(hash);
+    } else {
+        // Par défaut, afficher la page d'accueil
+        showSection('accueil');
+    }
+});
+
+// Gérer le bouton retour du navigateur
+window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.substring(1);
+    if (hash && document.getElementById(hash)) {
+        showSection(hash);
+    }
+});
         // Gestionnaire de soumission du formulaire
         const contactForm = document.querySelector('.contact-form');
         if (contactForm) {
